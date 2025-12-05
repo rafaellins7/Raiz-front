@@ -1,56 +1,55 @@
-// Navigation functionality
-function showSection(sectionId) {
-    // Hide all sections
-    const sections = document.querySelectorAll('.content-section');
-    sections.forEach(section => {
-        section.classList.remove('active');
+// Funcionalidade de navegação
+function mostrarSecao(idSecao) {
+    // Esconder todas as seções
+    const secoes = document.querySelectorAll('.secao-conteudo');
+    secoes.forEach(secao => {
+        secao.classList.remove('ativo');
     });
     
-    // Show selected section
-    const targetSection = document.getElementById(sectionId);
-    if (targetSection) {
-        targetSection.classList.add('active');
+    // Mostrar seção selecionada
+    const secaoAlvo = document.getElementById(idSecao);
+    if (secaoAlvo) {
+        secaoAlvo.classList.add('ativo');
     }
     
-    // Update active nav item
-    const navItems = document.querySelectorAll('.nav-item');
-    navItems.forEach(item => {
-        item.classList.remove('active');
+    // Atualizar item de navegação ativo
+    const itensNavegacao = document.querySelectorAll('.item-navegacao');
+    itensNavegacao.forEach(item => {
+        item.classList.remove('ativo');
     });
     
-    event.target.closest('.nav-item').classList.add('active');
+    evento.target.closest('.item-navegacao').classList.add('ativo');
     
-    // Show notification
-    showNotification(`Navegando para ${sectionId.charAt(0).toUpperCase() + sectionId.slice(1)}`);
+    // Mostrar notificação
+    mostrarNotificacao(`Navegando para ${idSecao.charAt(0).toUpperCase() + idSecao.slice(1)}`);
 }
 
-// Logout functionality
-function handleLogout() {
+// Funcionalidade de logout
+function lidarComSair() {
     if (confirm('Tem certeza que deseja sair do sistema?')) {
-        showNotification('Saindo do sistema...', 'info');
+        mostrarNotificacao('Saindo do sistema...', 'info');
         setTimeout(() => {
             alert('Logout realizado com sucesso!');
-            // In a real application, this would redirect to login page
             window.location.reload();
         }, 1000);
     }
 }
 
-// Profile edit functionality
-function handleEditProfile() {
-    showNotification('Modo de edição ativado', 'success');
-    const inputs = document.querySelectorAll('.profile-form input');
-    inputs.forEach(input => {
-        input.focus();
-   // Focus on first input
+// Funcionalidade de edição de perfil
+function lidarComEditarPerfil() {
+    mostrarNotificacao('Modo de edição ativado', 'sucesso');
+    const entradas = document.querySelectorAll('.formulario-perfil input');
+    entradas.forEach(entrada => {
+        entrada.focus();
+        // Focar na primeira entrada
     });
 }
 
-// Save changes functionality
-function handleSaveChanges(event) {
-    event.preventDefault();
+// salvar alterações
+function lidarComSalvarAlteracoes(evento) {
+    evento.preventDefault();
     
-    const formData = {
+    const dadosFormulario = {
         nomeCompleto: document.getElementById('nomeCompleto').value,
         cep: document.getElementById('cep').value,
         email: document.getElementById('email').value,
@@ -61,93 +60,92 @@ function handleSaveChanges(event) {
         cidade: document.getElementById('cidade').value
     };
     
-    console.log('Dados salvos:', formData);
-    showNotification('Alterações salvas com sucesso!', 'success');
+    console.log('Dados salvos:', dadosFormulario);
+    mostrarNotificacao('Alterações salvas com sucesso!', 'sucesso');
     
-    // Simulate API call
     setTimeout(() => {
-        showModal('Sucesso', 'Seu perfil foi atualizado com sucesso!');
+        mostrarModal('Sucesso', 'Seu perfil foi atualizado com sucesso!');
     }, 500);
 }
 
-// Settings - Change Password
-function handleChangePassword() {
-    const modalContent = `
+// Ajustes - Alterar Senha
+function lidarComAlterarSenha() {
+    const conteudoModal = `
         <h2>Alterar Senha</h2>
-        <form onsubmit="saveNewPassword(event)" style="margin-top: 1.5rem;">
-            <div class="form-group" style="margin-bottom: 1rem;">
+        <form onsubmit="salvarNovaSenha(evento)" style="margin-top: 1.5rem;">
+            <div class="grupo-formulario" style="margin-bottom: 1rem;">
                 <label>Senha Atual</label>
-                <input type="password" id="currentPassword" required style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
+                <input type="password" id="senhaAtual" required style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
             </div>
-            <div class="form-group" style="margin-bottom: 1rem;">
+            <div class="grupo-formulario" style="margin-bottom: 1rem;">
                 <label>Nova Senha</label>
-                <input type="password" id="newPassword" required style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
+                <input type="password" id="novaSenha" required style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
             </div>
-            <div class="form-group" style="margin-bottom: 1.5rem;">
+            <div class="grupo-formulario" style="margin-bottom: 1.5rem;">
                 <label>Confirmar Nova Senha</label>
-                <input type="password" id="confirmPassword" required style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
+                <input type="password" id="confirmarSenha" required style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
             </div>
-            <button type="submit" class="btn-save">Salvar Nova Senha</button>
+            <button type="submit" class="btn-salvar">Salvar Nova Senha</button>
         </form>
     `;
     
-    document.getElementById('modalBody').innerHTML = modalContent;
+    document.getElementById('corpoModal').innerHTML = conteudoModal;
     document.getElementById('modal').style.display = 'block';
 }
 
-function saveNewPassword(event) {
-    event.preventDefault();
-    const newPass = document.getElementById('newPassword').value;
-    const confirmPass = document.getElementById('confirmPassword').value;
+function salvarNovaSenha(evento) {
+    evento.preventDefault();
+    const novaSenha = document.getElementById('novaSenha').value;
+    const confirmarSenha = document.getElementById('confirmarSenha').value;
     
-    if (newPass !== confirmPass) {
+    if (novaSenha !== confirmarSenha) {
         alert('As senhas não coincidem!');
         return;
     }
     
-    showNotification('Senha alterada com sucesso!', 'success');
-    closeModal();
+    mostrarNotificacao('Senha alterada com sucesso!', 'sucesso');
+    fecharModal();
 }
 
-// Orders functionality
-function handleNewOrder() {
-    const modalContent = `
+
+function lidarComNovoPedido() {
+    const conteudoModal = `
         <h2>Novo Pedido</h2>
-        <form onsubmit="saveNewOrder(event)" style="margin-top: 1.5rem;">
-            <div class="form-group" style="margin-bottom: 1rem;">
+        <form onsubmit="salvarNovoPedido(evento)" style="margin-top: 1.5rem;">
+            <div class="grupo-formulario" style="margin-bottom: 1rem;">
                 <label>Fornecedor</label>
-                <select id="orderSupplier" required style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
+                <select id="fornecedorPedido" required style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
                     <option value="">Selecione...</option>
                     <option value="1">Sementes Nordeste Ltda</option>
                     <option value="2">AgroSementes PE</option>
                     <option value="3">Distribuidora Agrícola</option>
                 </select>
             </div>
-            <div class="form-group" style="margin-bottom: 1rem;">
+            <div class="grupo-formulario" style="margin-bottom: 1rem;">
                 <label>Tipo de Semente</label>
-                <input type="text" id="orderSeedType" required style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
+                <input type="text" id="tipoSementePedido" required style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
             </div>
-            <div class="form-group" style="margin-bottom: 1.5rem;">
+            <div class="grupo-formulario" style="margin-bottom: 1.5rem;">
                 <label>Quantidade (kg)</label>
-                <input type="number" id="orderQuantity" required style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
+                <input type="number" id="quantidadePedido" required style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
             </div>
-            <button type="submit" class="btn-save">Criar Pedido</button>
+            <button type="submit" class="btn-salvar">Criar Pedido</button>
         </form>
     `;
     
-    document.getElementById('modalBody').innerHTML = modalContent;
+    document.getElementById('corpoModal').innerHTML = conteudoModal;
     document.getElementById('modal').style.display = 'block';
 }
 
-function saveNewOrder(event) {
-    event.preventDefault();
-    showNotification('Pedido criado com sucesso!', 'success');
-    closeModal();
+function salvarNovoPedido(evento) {
+    evento.preventDefault();
+    mostrarNotificacao('Pedido criado com sucesso!', 'sucesso');
+    fecharModal();
 }
 
-function viewOrder(id) {
-    showNotification(`Visualizando pedido #${id}`, 'info');
-    const modalContent = `
+function verPedido(id) {
+    mostrarNotificacao(`Visualizando pedido #${id}`, 'info');
+    const conteudoModal = `
         <h2>Detalhes do Pedido #${String(id).padStart(3, '0')}</h2>
         <div style="margin-top: 1.5rem;">
             <p><strong>Status:</strong> Pendente</p>
@@ -158,57 +156,57 @@ function viewOrder(id) {
             <p><strong>Valor Total:</strong> R$ 5.000,00</p>
         </div>
     `;
-    document.getElementById('modalBody').innerHTML = modalContent;
+    document.getElementById('corpoModal').innerHTML = conteudoModal;
     document.getElementById('modal').style.display = 'block';
 }
 
-function editOrder(id) {
-    showNotification(`Editando pedido #${id}`, 'info');
-    handleNewOrder();
+function editarPedido(id) {
+    mostrarNotificacao(`Editando pedido #${id}`, 'info');
+    lidarComNovoPedido();
 }
 
-// Stock functionality
-function handleAddStock() {
-    const modalContent = `
+// Funcionalidade de estoque
+function lidarComAdicionarEstoque() {
+    const conteudoModal = `
         <h2>Adicionar Item ao Estoque</h2>
-        <form onsubmit="saveNewStock(event)" style="margin-top: 1.5rem;">
-            <div class="form-group" style="margin-bottom: 1rem;">
+        <form onsubmit="salvarNovoEstoque(evento)" style="margin-top: 1.5rem;">
+            <div class="grupo-formulario" style="margin-bottom: 1rem;">
                 <label>Tipo de Semente</label>
-                <input type="text" id="stockSeedType" required style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
+                <input type="text" id="tipoSementeEstoque" required style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
             </div>
-            <div class="form-group" style="margin-bottom: 1rem;">
+            <div class="grupo-formulario" style="margin-bottom: 1rem;">
                 <label>Variedade</label>
-                <input type="text" id="stockVariety" required style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
+                <input type="text" id="variedadeEstoque" required style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
             </div>
-            <div class="form-group" style="margin-bottom: 1rem;">
+            <div class="grupo-formulario" style="margin-bottom: 1rem;">
                 <label>Quantidade (kg)</label>
-                <input type="number" id="stockQuantity" required style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
+                <input type="number" id="quantidadeEstoque" required style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
             </div>
-            <div class="form-group" style="margin-bottom: 1rem;">
+            <div class="grupo-formulario" style="margin-bottom: 1rem;">
                 <label>Lote</label>
-                <input type="text" id="stockLot" required style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
+                <input type="text" id="loteEstoque" required style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
             </div>
-            <div class="form-group" style="margin-bottom: 1.5rem;">
+            <div class="grupo-formulario" style="margin-bottom: 1.5rem;">
                 <label>Validade</label>
-                <input type="month" id="stockExpiry" required style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
+                <input type="month" id="validadeEstoque" required style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
             </div>
-            <button type="submit" class="btn-save">Adicionar ao Estoque</button>
+            <button type="submit" class="btn-salvar">Adicionar ao Estoque</button>
         </form>
     `;
     
-    document.getElementById('modalBody').innerHTML = modalContent;
+    document.getElementById('corpoModal').innerHTML = conteudoModal;
     document.getElementById('modal').style.display = 'block';
 }
 
-function saveNewStock(event) {
-    event.preventDefault();
-    showNotification('Item adicionado ao estoque com sucesso!', 'success');
-    closeModal();
+function salvarNovoEstoque(evento) {
+    evento.preventDefault();
+    mostrarNotificacao('Item adicionado ao estoque com sucesso!', 'sucesso');
+    fecharModal();
 }
 
-function viewStock(id) {
-    showNotification(`Visualizando item de estoque #${id}`, 'info');
-    const modalContent = `
+function verEstoque(id) {
+    mostrarNotificacao(`Visualizando item de estoque #${id}`, 'info');
+    const conteudoModal = `
         <h2>Detalhes do Item SEM-${String(id).padStart(3, '0')}</h2>
         <div style="margin-top: 1.5rem;">
             <p><strong>Tipo:</strong> Milho</p>
@@ -219,23 +217,23 @@ function viewStock(id) {
             <p><strong>Localização:</strong> Armazém A - Prateleira 3</p>
         </div>
     `;
-    document.getElementById('modalBody').innerHTML = modalContent;
+    document.getElementById('corpoModal').innerHTML = conteudoModal;
     document.getElementById('modal').style.display = 'block';
 }
 
-function editStock(id) {
-    showNotification(`Editando item de estoque #${id}`, 'info');
-    handleAddStock();
+function editarEstoque(id) {
+    mostrarNotificacao(`Editando item de estoque #${id}`, 'info');
+    lidarComAdicionarEstoque();
 }
 
-// Reports functionality
-function handleGenerateReport() {
-    const modalContent = `
+//relatórios
+function lidarComGerarRelatorio() {
+    const conteudoModal = `
         <h2>Gerar Relatório Personalizado</h2>
-        <form onsubmit="generateCustomReport(event)" style="margin-top: 1.5rem;">
-            <div class="form-group" style="margin-bottom: 1rem;">
+        <form onsubmit="gerarRelatorioPersonalizado(evento)" style="margin-top: 1.5rem;">
+            <div class="grupo-formulario" style="margin-bottom: 1rem;">
                 <label>Tipo de Relatório</label>
-                <select id="reportType" required style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
+                <select id="tipoRelatorio" required style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
                     <option value="">Selecione...</option>
                     <option value="estoque">Estoque</option>
                     <option value="distribuicao">Distribuição</option>
@@ -243,72 +241,72 @@ function handleGenerateReport() {
                     <option value="financeiro">Financeiro</option>
                 </select>
             </div>
-            <div class="form-group" style="margin-bottom: 1rem;">
+            <div class="grupo-formulario" style="margin-bottom: 1rem;">
                 <label>Período Inicial</label>
-                <input type="date" id="reportStartDate" required style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
+                <input type="date" id="dataInicialRelatorio" required style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
             </div>
-            <div class="form-group" style="margin-bottom: 1.5rem;">
+            <div class="grupo-formulario" style="margin-bottom: 1.5rem;">
                 <label>Período Final</label>
-                <input type="date" id="reportEndDate" required style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
+                <input type="date" id="dataFinalRelatorio" required style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
             </div>
-            <button type="submit" class="btn-save">Gerar Relatório</button>
+            <button type="submit" class="btn-salvar">Gerar Relatório</button>
         </form>
     `;
     
-    document.getElementById('modalBody').innerHTML = modalContent;
+    document.getElementById('corpoModal').innerHTML = conteudoModal;
     document.getElementById('modal').style.display = 'block';
 }
 
-function generateCustomReport(event) {
-    event.preventDefault();
-    showNotification('Gerando relatório...', 'info');
+function gerarRelatorioPersonalizado(evento) {
+    evento.preventDefault();
+    mostrarNotificacao('Gerando relatório...', 'info');
     setTimeout(() => {
-        showNotification('Relatório gerado com sucesso!', 'success');
-        closeModal();
+        mostrarNotificacao('Relatório gerado com sucesso!', 'sucesso');
+        fecharModal();
     }, 1500);
 }
 
-function generateReport(type) {
-    showNotification(`Gerando relatório de ${type}...`, 'info');
+function gerarRelatorio(tipo) {
+    mostrarNotificacao(`Gerando relatório de ${tipo}...`, 'info');
     setTimeout(() => {
-        alert(`Relatório de ${type} gerado com sucesso!\nO arquivo foi salvo na área de downloads.`);
+        alert(`Relatório de ${tipo} gerado com sucesso!\nO arquivo foi salvo na área de downloads.`);
     }, 1500);
 }
 
-// Messages functionality
-function handleNewMessage() {
-    const modalContent = `
+//mensagens
+function lidarComNovaMensagem() {
+    const conteudoModal = `
         <h2>Nova Mensagem</h2>
-        <form onsubmit="sendMessage(event)" style="margin-top: 1.5rem;">
-            <div class="form-group" style="margin-bottom: 1rem;">
+        <form onsubmit="enviarMensagem(evento)" style="margin-top: 1.5rem;">
+            <div class="grupo-formulario" style="margin-bottom: 1rem;">
                 <label>Destinatário</label>
-                <input type="text" id="messageRecipient" required style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
+                <input type="text" id="destinatarioMensagem" required style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
             </div>
-            <div class="form-group" style="margin-bottom: 1rem;">
+            <div class="grupo-formulario" style="margin-bottom: 1rem;">
                 <label>Assunto</label>
-                <input type="text" id="messageSubject" required style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
+                <input type="text" id="assuntoMensagem" required style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
             </div>
-            <div class="form-group" style="margin-bottom: 1.5rem;">
+            <div class="grupo-formulario" style="margin-bottom: 1.5rem;">
                 <label>Mensagem</label>
-                <textarea id="messageBody" rows="5" required style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;"></textarea>
+                <textarea id="corpoMensagem" rows="5" required style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;"></textarea>
             </div>
-            <button type="submit" class="btn-save">Enviar Mensagem</button>
+            <button type="submit" class="btn-salvar">Enviar Mensagem</button>
         </form>
     `;
     
-    document.getElementById('modalBody').innerHTML = modalContent;
+    document.getElementById('corpoModal').innerHTML = conteudoModal;
     document.getElementById('modal').style.display = 'block';
 }
 
-function sendMessage(event) {
-    event.preventDefault();
-    showNotification('Mensagem enviada com sucesso!', 'success');
-    closeModal();
+function enviarMensagem(evento) {
+    evento.preventDefault();
+    mostrarNotificacao('Mensagem enviada com sucesso!', 'sucesso');
+    fecharModal();
 }
 
-function openMessage(id) {
-    showNotification(`Abrindo mensagem #${id}`, 'info');
-    const modalContent = `
+function abrirMensagem(id) {
+    mostrarNotificacao(`Abrindo mensagem #${id}`, 'info');
+    const conteudoModal = `
         <h2>Mensagem de João Oliveira</h2>
         <div style="margin-top: 1.5rem;">
             <p style="color: #666; margin-bottom: 1rem;"><small>Recebida em: ${new Date().toLocaleString('pt-BR')}</small></p>
@@ -319,56 +317,56 @@ function openMessage(id) {
                 <p>Aguardo retorno.</p>
                 <p>Atenciosamente,<br>João Oliveira</p>
             </div>
-            <button onclick="replyMessage()" class="btn-primary" style="margin-top: 1rem;">Responder</button>
+            <button onclick="responderMensagem()" class="btn-primario" style="margin-top: 1rem;">Responder</button>
         </div>
     `;
-    document.getElementById('modalBody').innerHTML = modalContent;
+    document.getElementById('corpoModal').innerHTML = conteudoModal;
     document.getElementById('modal').style.display = 'block';
 }
 
-function replyMessage() {
-    closeModal();
-    handleNewMessage();
+function responderMensagem() {
+    fecharModal();
+    lidarComNovaMensagem();
 }
 
-// Suppliers functionality
-function handleAddSupplier() {
-    const modalContent = `
+// fornecedores
+function lidarComAdicionarFornecedor() {
+    const conteudoModal = `
         <h2>Adicionar Fornecedor</h2>
-        <form onsubmit="saveNewSupplier(event)" style="margin-top: 1.5rem;">
-            <div class="form-group" style="margin-bottom: 1rem;">
+        <form onsubmit="salvarNovoFornecedor(evento)" style="margin-top: 1.5rem;">
+            <div class="grupo-formulario" style="margin-bottom: 1rem;">
                 <label>Nome do Fornecedor</label>
-                <input type="text" id="supplierName" required style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
+                <input type="text" id="nomeFornecedor" required style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
             </div>
-            <div class="form-group" style="margin-bottom: 1rem;">
+            <div class="grupo-formulario" style="margin-bottom: 1rem;">
                 <label>CNPJ</label>
-                <input type="text" id="supplierCNPJ" required style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
+                <input type="text" id="cnpjFornecedor" required style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
             </div>
-            <div class="form-group" style="margin-bottom: 1rem;">
+            <div class="grupo-formulario" style="margin-bottom: 1rem;">
                 <label>Contato</label>
-                <input type="tel" id="supplierContact" required style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
+                <input type="tel" id="contatoFornecedor" required style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
             </div>
-            <div class="form-group" style="margin-bottom: 1.5rem;">
+            <div class="grupo-formulario" style="margin-bottom: 1.5rem;">
                 <label>Cidade</label>
-                <input type="text" id="supplierCity" required style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
+                <input type="text" id="cidadeFornecedor" required style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
             </div>
-            <button type="submit" class="btn-save">Adicionar Fornecedor</button>
+            <button type="submit" class="btn-salvar">Adicionar Fornecedor</button>
         </form>
     `;
     
-    document.getElementById('modalBody').innerHTML = modalContent;
+    document.getElementById('corpoModal').innerHTML = conteudoModal;
     document.getElementById('modal').style.display = 'block';
 }
 
-function saveNewSupplier(event) {
-    event.preventDefault();
-    showNotification('Fornecedor adicionado com sucesso!', 'success');
-    closeModal();
+function salvarNovoFornecedor(evento) {
+    evento.preventDefault();
+    mostrarNotificacao('Fornecedor adicionado com sucesso!', 'sucesso');
+    fecharModal();
 }
 
-function viewSupplier(id) {
-    showNotification(`Visualizando fornecedor #${id}`, 'info');
-    const modalContent = `
+function verFornecedor(id) {
+    mostrarNotificacao(`Visualizando fornecedor #${id}`, 'info');
+    const conteudoModal = `
         <h2>Detalhes do Fornecedor #F${String(id).padStart(3, '0')}</h2>
         <div style="margin-top: 1.5rem;">
             <p><strong>Nome:</strong> Sementes Nordeste Ltda</p>
@@ -381,87 +379,86 @@ function viewSupplier(id) {
             <p><strong>Avaliação:</strong> ⭐⭐⭐⭐⭐ (5.0)</p>
         </div>
     `;
-    document.getElementById('modalBody').innerHTML = modalContent;
+    document.getElementById('corpoModal').innerHTML = conteudoModal;
     document.getElementById('modal').style.display = 'block';
 }
 
-function editSupplier(id) {
-    showNotification(`Editando fornecedor #${id}`, 'info');
-    handleAddSupplier();
+function editarFornecedor(id) {
+    mostrarNotificacao(`Editando fornecedor #${id}`, 'info');
+    lidarComAdicionarFornecedor();
 }
 
-// Transparency functionality
-function viewTransparencyData(type) {
-    showNotification(`Acessando dados de ${type}...`, 'info');
+// Funcionalidade de transparência
+function verDadosTransparencia(tipo) {
+    mostrarNotificacao(`Acessando dados de ${tipo}...`, 'info');
     setTimeout(() => {
-        alert(`Abrindo página de ${type}...\nEm um sistema real, isso redirecionaria para a página específica.`);
+        alert(`Abrindo página de ${tipo}...\nEm um sistema real, isso redirecionaria para a página específica.`);
     }, 500);
 }
 
-// Modal functionality
-function showModal(title, message) {
-    const modalContent = `
-        <h2>${title}</h2>
-        <p style="margin-top: 1.5rem;">${message}</p>
+// Funcionalidade do modal
+function mostrarModal(titulo, mensagem) {
+    const conteudoModal = `
+        <h2>${titulo}</h2>
+        <p style="margin-top: 1.5rem;">${mensagem}</p>
     `;
-    document.getElementById('modalBody').innerHTML = modalContent;
+    document.getElementById('corpoModal').innerHTML = conteudoModal;
     document.getElementById('modal').style.display = 'block';
 }
 
-function closeModal() {
+function fecharModal() {
     document.getElementById('modal').style.display = 'none';
 }
 
-// Close modal when clicking outside
-window.onclick = function(event) {
+// Fechar modal ao clicar fora
+window.onclick = function(evento) {
     const modal = document.getElementById('modal');
-    if (event.target == modal) {
-        closeModal();
+    if (evento.target == modal) {
+        fecharModal();
     }
 }
 
-// Notification system
-function showNotification(message, type = 'info') {
-    // Remove existing notification if any
-    const existingNotification = document.querySelector('.notification');
-    if (existingNotification) {
-        existingNotification.remove();
+// notificações
+function mostrarNotificacao(mensagem, tipo = 'info') {
+    // Remover notificação existente se houver
+    const notificacaoExistente = document.querySelector('.notificacao');
+    if (notificacaoExistente) {
+        notificacaoExistente.remove();
     }
     
-    // Create notification element
-    const notification = document.createElement('div');
-    notification.className = `notification notification-${type}`;
-    notification.textContent = message;
     
-    // Add styles
-    notification.style.cssText = `
+    const notificacao = document.createElement('div');
+    notificacao.className = `notificacao notificacao-${tipo}`;
+    notificacao.textContent = mensagem;
+    
+    
+    notificacao.style.cssText = `
         position: fixed;
         top: 20px;
         right: 20px;
-        background-color: ${type === 'success' ? '#28a745' : type === 'error' ? '#dc3545' : '#5a8a1f'};
+        background-color: ${tipo === 'sucesso' ? '#28a745' : tipo === 'erro' ? '#dc3545' : '#5a8a1f'};
         color: white;
         padding: 1rem 1.5rem;
         border-radius: 4px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         z-index: 10000;
-        animation: slideIn 0.3s ease;
+        animation: deslizarEntrada 0.3s ease;
     `;
     
-    document.body.appendChild(notification);
+    document.body.appendChild(notificacao);
     
-    // Remove after 3 seconds
+    // Remover após 3 segundos
     setTimeout(() => {
-        notification.style.animation = 'slideOut 0.3s ease';
+        notificacao.style.animation = 'deslizarSaida 0.3s ease';
         setTimeout(() => {
-            notification.remove();
+            notificacao.remove();
         }, 300);
     }, 3000);
 }
 
-// Add animation styles
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes slideIn {
+const estilo = document.createElement('style');
+estilo.textContent = `
+    @keyframes deslizarEntrada {
         from {
             transform: translateX(400px);
             opacity: 0;
@@ -472,7 +469,7 @@ style.textContent = `
         }
     }
     
-    @keyframes slideOut {
+    @keyframes deslizarSaida {
         from {
             transform: translateX(0);
             opacity: 1;
@@ -483,46 +480,46 @@ style.textContent = `
         }
     }
 `;
-document.head.appendChild(style);
+document.head.appendChild(estilo);
 
-// Initialize on page load
+// Inicializar ao carregar a página
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Sistema de Gestão de Sementes - IPA iniciado');
-    showNotification('Bem-vindo ao Sistema de Gestão de Sementes!', 'success');
+    mostrarNotificacao('Bem-vindo ao Sistema de Gestão de Sementes!', 'sucesso');
 });
 
-// Form input masks
+
 document.addEventListener('DOMContentLoaded', function() {
-    const cpfInput = document.getElementById('cpf');
-    const telefoneInput = document.getElementById('telefone');
-    const cepInput = document.getElementById('cep');
+    const entradaCpf = document.getElementById('cpf');
+    const entradaTelefone = document.getElementById('telefone');
+    const entradaCep = document.getElementById('cep');
     
-    if (cpfInput) {
-        cpfInput.addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\D/g, '');
-            if (value.length <= 11) {
-                value = value.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
-                e.target.value = value;
+    if (entradaCpf) {
+        entradaCpf.addEventListener('input', function(e) {
+            let valor = e.target.value.replace(/\D/g, '');
+            if (valor.length <= 11) {
+                valor = valor.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+                e.target.value = valor;
             }
         });
     }
     
-    if (telefoneInput) {
-        telefoneInput.addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\D/g, '');
-            if (value.length <= 11) {
-                value = value.replace(/(\d{2})(\d{1})(\d{4})(\d{4})/, '($1) $2 $3-$4');
-                e.target.value = value;
+    if (entradaTelefone) {
+        entradaTelefone.addEventListener('input', function(e) {
+            let valor = e.target.value.replace(/\D/g, '');
+            if (valor.length <= 11) {
+                valor = valor.replace(/(\d{2})(\d{1})(\d{4})(\d{4})/, '($1) $2 $3-$4');
+                e.target.value = valor;
             }
         });
     }
     
-    if (cepInput) {
-        cepInput.addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\D/g, '');
-            if (value.length <= 8) {
-                value = value.replace(/(\d{6})(\d{2})/, '$1-$2');
-                e.target.value = value;
+    if (entradaCep) {
+        entradaCep.addEventListener('input', function(e) {
+            let valor = e.target.value.replace(/\D/g, '');
+            if (valor.length <= 8) {
+                valor = valor.replace(/(\d{6})(\d{2})/, '$1-$2');
+                e.target.value = valor;
             }
         });
     }
