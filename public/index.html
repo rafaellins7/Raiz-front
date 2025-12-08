@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IPA - Sistema de Gestão de Sementes</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+ <body>
+    <!-- Cabeçalho -->
+    <header class="cabecalho">
+        <div class="cabecalho-esquerda">
+            <div class="logo">
+                <i class="fas fa-seedling"></i>
+            </div>
+            <div class="texto-cabecalho">
+                <h1>IPA - Instituto Agrônomo de Pernambuco</h1>
+                <p>Sistema de Gestão de Sementes</p>
+            </div>
+        </div>
+        <div class="cabecalho-direita">
+            <span class="rotulo-usuario">Usuário:</span>
+            <span class="nome-usuario">Roberto Silva</span>
+            <button class="btn-sair" onclick="lidarComSair()">Sair</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Barra Lateral -->
+       <aside class="barra-lateral">
+    <nav class="menu-navegacao">
+        <a href="index.html" class="item-navegacao">
+            <i class="fas fa-user"></i>
+            <span>Perfil</span>
+        </a>
+
+        <a href="ajustes.html" class="item-navegacao">
+            <i class="fas fa-cog"></i>
+            <span>Ajustes</span>
+        </a>
+
+        <a href="pedidos.html" class="item-navegacao">
+            <i class="fas fa-shopping-cart"></i>
+            <span>Pedidos</span>
+        </a>
+
+        <a href="estoque.html" class="item-navegacao">
+            <i class="fas fa-box"></i>
+            <span>Estoque</span>
+        </a>
+
+        <a href="relatorios.html" class="item-navegacao">
+            <i class="fas fa-chart-line"></i>
+            <span>Relatórios</span>
+        </a>
+
+        <a href="mensagens.html" class="item-navegacao">
+            <i class="fas fa-comments"></i>
+            <span>Mensagens</span>
+        </a>
+
+        <a href="fornecedores.html" class="item-navegacao">
+            <i class="fas fa-truck"></i>
+            <span>Fornecedores</span>
+        </a>
+
+        <a href="transparencia.html" class="item-navegacao">
+            <i class="fas fa-chart-bar"></i>
+            <span>Transparência</span>
+        </a>
+
+        <a href="painel.html" class="item-navegacao">
+            <i class="fas fa-tachometer-alt"></i>
+            <span>Painel</span>
+        </a>
+    </nav>
+</aside>
+
+    <main class="conteudo-principal">
+            <!-- Seção Perfil -->
+            <section id="perfil" class="secao-conteudo ativo">
+                <div class="cabecalho-pagina">
+                    <div class="indicador-etapa"></div>
+                    <h2>Perfil</h2>
+                </div>
+
+                <div class="cartao">
+                    <div class="cabecalho-cartao">
+                        <div class="indicador-etapa"></div>
+                        <h3>IDENTIFICAÇÃO DO USUÁRIO</h3>
+                    </div>
+
+                    <div class="perfil-usuario">
+                        <div class="foto-perfil">
+                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop" alt="Roberto Silva" id="imagemPerfil">
+                        </div>
+                        <div class="info-perfil">
+                            <h4>ROBERTO SILVA SANTOS</h4>
+                            <p class="cargo">Cargo: Gestor de Distribuição</p>
+                            <p class="unidade">Unidade de Atuação: Sede (Recife)</p>
+                            <button class="btn-editar" onclick="lidarComEditarPerfil()">
+                                <i class="fas fa-edit"></i> Editar Perfil
+                            </button>
+                        </div>
+                    </div>
+
+                    <form class="formulario-perfil" onsubmit="lidarComSalvarAlteracoes(event)">
+                        <div class="linha-formulario">
+                            <div class="grupo-formulario">
+                                <label for="nomeCompleto">Nome Completo</label>
+                                <input type="text" id="nomeCompleto" value="Roberto Silva Santos" required>
+                            </div>
+                            <div class="grupo-formulario">
+                                <label for="cep">CEP</label>
+                                <input type="text" id="cep" value="558088-40" required>
+                            </div>
+                        </div>
+
+                        <div class="linha-formulario">
+                            <div class="grupo-formulario">
+                                <label for="email">E-mail</label>
+                                <input type="email" id="email" value="robertosilva@gmail.com" required>
+                            </div>
+                            <div class="grupo-formulario">
+                                <label for="logradouro">Logradouro</label>
+                                <input type="text" id="logradouro" value="Rua Recife, 47" required>
+                            </div>
+                        </div>
+
+                        <div class="linha-formulario">
+                            <div class="grupo-formulario">
+                                <label for="cpf">CPF</label>
+                                <input type="text" id="cpf" value="529.982.247-25" required>
+                            </div>
+                            <div class="grupo-formulario">
+                                <label for="bairro">Bairro</label>
+                                <input type="text" id="bairro" value="Boa Vista" required>
+                            </div>
+                        </div>
+
+                        <div class="linha-formulario">
+                            <div class="grupo-formulario">
+                                <label for="telefone">Telefone</label>
+                                <input type="tel" id="telefone" value="(81) 9 9999-9999" required>
+                            </div>
+                            <div class="grupo-formulario">
+                                <label for="cidade">Cidade</label>
+                                <input type="text" id="cidade" value="Recife - PE" required>
+                            </div>
+                        </div>
+
+                        <div class="acoes-formulario">
+                            <button type="submit" class="btn-salvar">SALVAR ALTERAÇÕES</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+        </main>
+    </div>
+
+     <div id="modal" class="modal">
+        <div class="conteudo-modal">
+            <span class="fechar" onclick="fecharModal()">&times;</span>
+            <div id="corpoModal"></div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
