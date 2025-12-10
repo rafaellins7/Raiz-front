@@ -192,6 +192,16 @@ function validarCampo(campo, tipo) {
             mensagem = valido ? '' : 'Data deve ser futura';
             break;
     }
+
+    Validacao.dataFutura = function(valor) {
+    if (!valor) return false;
+
+    // valor do input month vem no formato "YYYY-MM"
+    const hoje = new Date();
+    const data = new Date(valor + "-01"); 
+
+    return data > hoje;
+    };
     
     // estilo de validação
     if (mensagem) {
@@ -290,7 +300,7 @@ function validarFormulario(formId) {
         }
     });
     
-    // Se houver campos inválidos, mostrar ALERT com resumo (APENAS AQUI)
+    // Se houver campos inválidos, mostrar ALERT 
     if (!valido && camposInvalidos.length > 0) {
         const mensagemResumo = `Foram encontrados ${camposInvalidos.length} erro(s) de validação:\n\n` +
             camposInvalidos.map(c => `• ${c.nome}`).join('\n') +
@@ -624,7 +634,7 @@ function salvarNovoEstoque(evento) {
     }
     
     mostrarNotificacao('Item adicionado ao estoque com sucesso!', 'sucesso');
-    fecharModal();
+     fecharModal();
 }
 
 function verEstoque(id) {
