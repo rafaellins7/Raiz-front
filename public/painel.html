@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IPA - Sistema de Gestão de Sementes</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- CHART.JS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <!-- Cabeçalho -->
+    <header class="cabecalho">
+        <div class="cabecalho-esquerda">
+            <div class="logo">
+                <i class="fas fa-seedling"></i>
+            </div>
+            <div class="texto-cabecalho">
+                <h1>IPA - Instituto Agrônomo de Pernambuco</h1>
+                <p>Sistema de Gestão de Sementes</p>
+            </div>
+        </div>
+        <div class="cabecalho-direita">
+            <span class="rotulo-usuario">Usuário:</span>
+            <span class="nome-usuario">Roberto Silva</span>
+            <button class="btn-sair" onclick="lidarComSair()">Sair</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="barra-lateral">
+            <nav class="menu-navegacao">
+                <a href="index.html" class="item-navegacao">
+                    <i class="fas fa-user"></i>
+                    <span>Perfil</span>
+                </a>
+
+                <a href="ajustes.html" class="item-navegacao">
+                    <i class="fas fa-cog"></i>
+                    <span>Ajustes</span>
+                </a>
+
+                <a href="pedidos.html" class="item-navegacao">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Pedidos</span>
+                </a>
+
+                <a href="estoque.html" class="item-navegacao">
+                    <i class="fas fa-box"></i>
+                    <span>Estoque</span>
+                </a>
+
+                <a href="relatorios.html" class="item-navegacao">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Relatórios</span>
+                </a>
+
+                <a href="mensagens.html" class="item-navegacao">
+                    <i class="fas fa-comments"></i>
+                    <span>Mensagens</span>
+                </a>
+
+                <a href="fornecedores.html" class="item-navegacao">
+                    <i class="fas fa-truck"></i>
+                    <span>Fornecedores</span>
+                </a>
+
+                <a href="transparencia.html" class="item-navegacao">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Transparência</span>
+                </a>
+
+                <a href="painel.html" class="item-navegacao ativo">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Painel</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Conteúdo -->
+        <main class="conteudo-principal">
+<section id="painel" class="secao-conteudo ativo">
+
+    <h2>Painel</h2>
+
+    <!-- Cards -->
+    <div class="grade-estatisticas">
+        <div class="cartao-estatistica">
+            <h3>Pedidos este mês</h3>
+            <p class="valor">45</p>
+        </div>
+
+        <div class="cartao-estatistica">
+            <h3>Estoque total</h3>
+            <p class="valor">2.450 kg</p>
+        </div>
+
+        <div class="cartao-estatistica">
+            <h3>Entregas pendentes</h3>
+            <p class="valor">8</p>
+        </div>
+
+        <div class="cartao-estatistica">
+            <h3>Valor total</h3>
+            <p class="valor">R$ 125.000</p>
+        </div>
+    </div>
+
+    <div class="graficos-lado-a-lado">
+
+    <!-- Gráfico 1 -->
+    <div class="cartao-grafico-pequeno">
+        <h3>Pedidos por mês</h3>
+        <div class="grafico-container-pequeno">
+            <canvas id="graficoPedidos"></canvas>
+        </div>
+    </div>
+
+    <!-- Gráfico 2 -->
+    <div class="cartao-grafico-pequeno">
+        <h3>Distribuição do estoque</h3>
+        <div class="grafico-container-pequeno">
+            <canvas id="graficoEstoque"></canvas>
+        </div>
+    </div>
+
+</div>
+        <div class="cartao">
+        <h3>Atividades Recentes</h3>
+         <div class="lista-atividades">
+         <div class="item-atividade">
+             <i class="fas fa-check-circle"></i>
+                <div>
+                 <p><strong>Pedido #003</strong> foi entregue</p>
+                     <small>Há 2 horas</small>
+                </div>
+                    </div>
+                        <div class="item-atividade">
+                            <i class="fas fa-plus-circle"></i>
+                            <div>
+                                <p><strong>Novo fornecedor</strong> cadastrado</p>
+                                <small>Há 5 horas</small>
+                            </div>
+                        </div>
+                        <div class="item-atividade">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <div>
+                                <p><strong>Estoque baixo</strong> de Feijão Carioca</p>
+                                <small>Há 1 dia</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal" class="modal">
+        <div class="conteudo-modal">
+            <span class="fechar" onclick="fecharModal()">&times;</span>
+            <div id="corpoModal"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+
+    <!-- SCRIPT DOS GRÁFICOS -->
+    <script>
+        // GRÁFICO DE BARRAS - Pedidos por mês
+       const ctx1 = document.getElementById('graficoPedidos');
+        new Chart(ctx1, {
+        type: 'bar',
+        data: {
+        labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+        datasets: [{
+            label: 'Pedidos',
+            data: [12, 19, 3, 5, 2, 15],
+            backgroundColor: '#4CAF50'
+        }]
+    },
+    options: {
+        maintainAspectRatio: false
+    }
+});
+
+const ctx2 = document.getElementById('graficoEstoque');
+new Chart(ctx2, {
+    type: 'doughnut',
+    data: {
+        labels: ['Milho', 'Feijão', 'Arroz', 'Sorgo'],
+        datasets: [{
+            data: [45, 25, 20, 10],
+            backgroundColor: ['#4CAF50', '#FFC107', '#2196F3', '#9C27B0']
+        }]
+    },
+    options: {
+        maintainAspectRatio: false
+    }
+});
+
+    </script>
+
+</body>
+</html>
