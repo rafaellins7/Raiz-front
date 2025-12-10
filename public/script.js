@@ -1,3 +1,7 @@
+let estoqueData = []; // Array para armazenar os itens
+let itemEditando = null; 
+const API_URL = '/api/estoque'; // URL daAPI
+
 const Validacao = {
     // Validação de CPF 
     cpf: function(cpf) {
@@ -117,6 +121,14 @@ const Validacao = {
         return !isNaN(num) && num > 0;
     },
     
+    // Validação de data futura (para validade)
+    dataFutura: function(valor) {
+        if (!valor) return false;
+        // valor do input month vem no formato "YYYY-MM"
+        const hoje = new Date();
+        const data = new Date(valor + "-01"); 
+        return data > hoje;
+    }
 };
 
 function validarCampo(campo, tipo) {
@@ -138,7 +150,6 @@ function validarCampo(campo, tipo) {
         
         return false;
     }
-    
     
     // validações por tipo
     switch(tipo) {
@@ -192,16 +203,6 @@ function validarCampo(campo, tipo) {
             mensagem = valido ? '' : 'Data deve ser futura';
             break;
     }
-
-    Validacao.dataFutura = function(valor) {
-    if (!valor) return false;
-
-    // valor do input month vem no formato "YYYY-MM"
-    const hoje = new Date();
-    const data = new Date(valor + "-01"); 
-
-    return data > hoje;
-    };
     
     // estilo de validação
     if (mensagem) {
@@ -424,7 +425,6 @@ function lidarComSalvarAlteracoes(evento) {
         return;
     }
     
-    // se chegou aqui, todos os campos são válidos
     const dadosFormulario = {
         nomeCompleto: campos.nomeCompleto?.value || '',
         cep: campos.cep?.value || '',
@@ -471,7 +471,6 @@ function lidarComAlterarSenha() {
     document.getElementById('corpoModal').innerHTML = conteudoModal;
     document.getElementById('modal').style.display = 'block';
     
-    // Adicionar event listener para o formulário
     setTimeout(() => {
         const form = document.getElementById('formAlterarSenha');
         if (form) {
@@ -486,7 +485,6 @@ function lidarComAlterarSenha() {
 function salvarNovaSenha(evento) {
     evento.preventDefault();
     
-    // Validar formulário
     if (!validarFormulario('formAlterarSenha')) {
         mostrarNotificacao('Preencha todos os campos corretamente', 'erro');
         return;
@@ -500,7 +498,8 @@ function salvarNovaSenha(evento) {
         return;
     }
 
-     if (senhaAtual === novaSenha) {
+    const senhaAtual = document.getElementById('senhaAtual')?.value;
+    if (senhaAtual === novaSenha) {
         mostrarNotificacao('Sua nova senha não pode ser igual à senha atual!', 'erro');
         return;
     }
@@ -583,80 +582,363 @@ function editarPedido(id) {
     lidarComNovoPedido();
 }
 
-function lidarComAdicionarEstoque() {
+// FUNÇÕES DE ESTOQUE 
+function lidarComAdicionarEstoque(item = null) {
+    itemEditando = item;
+    
+    const titulo = item ? 'Editar Item do Estoque' : 'Adicionar Item ao Estoque';
+    const botaoTexto = item ? 'Salvar Alterações' : 'Adicionar ao Estoque';
+    
+    let validadeFormatada = '';
+    if (item && item.validade) {
+        const [mes, ano] = item.validade.split('/');
+        validadeFormatada = `${ano}-${mes.padStart(2, '0')}`;
+    }
+    
     const conteudoModal = `
-        <h2>Adicionar Item ao Estoque</h2>
-        <form id="formAdicionarEstoque" style="margin-top: 1.5rem;">
+        <h2>${titulo}</h2>
+        <form id="formEstoque" style="margin-top: 1.5rem;">
             <div class="grupo-formulario" style="margin-bottom: 1rem;">
                 <label>Tipo de Semente *</label>
-                <input type="text" id="tipoSementeEstoque" required style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
+                <input type="text" id="tipoSementeEstoque" 
+                       value="${item ? item.tipo_semente : ''}" 
+                       required 
+                       style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
             </div>
             <div class="grupo-formulario" style="margin-bottom: 1rem;">
                 <label>Variedade *</label>
-                <input type="text" id="variedadeEstoque" required style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
+                <input type="text" id="variedadeEstoque" 
+                       value="${item ? item.variedade : ''}" 
+                       required 
+                       style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
             </div>
             <div class="grupo-formulario" style="margin-bottom: 1rem;">
                 <label>Quantidade (kg) *</label>
-                <input type="number" id="quantidadeEstoque" required min="0.1" step="0.01" style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
+                <input type="number" id="quantidadeEstoque" 
+                       value="${item ? item.quantidade : ''}" 
+                       required min="0.1" step="0.01" 
+                       style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
             </div>
             <div class="grupo-formulario" style="margin-bottom: 1rem;">
                 <label>Lote *</label>
-                <input type="text" id="loteEstoque" required style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
+                <input type="text" id="loteEstoque" 
+                       value="${item ? item.lote : ''}" 
+                       required 
+                       style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
             </div>
             <div class="grupo-formulario" style="margin-bottom: 1.5rem;">
                 <label>Validade *</label>
-                <input type="month" id="validadeEstoque" required style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
+                <input type="month" id="validadeEstoque" 
+                       value="${validadeFormatada}" 
+                       required 
+                       style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
             </div>
-            <button type="submit" class="btn-salvar">Adicionar ao Estoque</button>
+            <div class="botoes-modal">
+                <button type="button" class="btn-secundario" onclick="fecharModal()" style="margin-right: 10px;">
+                    Cancelar
+                </button>
+                <button type="submit" class="btn-primario">
+                    ${botaoTexto}
+                </button>
+            </div>
         </form>
     `;
     
     document.getElementById('corpoModal').innerHTML = conteudoModal;
     document.getElementById('modal').style.display = 'block';
     
+
     setTimeout(() => {
-        const form = document.getElementById('formAdicionarEstoque');
+        const form = document.getElementById('formEstoque');
         if (form) {
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
-                salvarNovoEstoque(e);
+                salvarItemEstoque(e);
             });
         }
     }, 100);
 }
 
-function salvarNovoEstoque(evento) {
-    evento.preventDefault();
-    
-    if (!validarFormulario('formAdicionarEstoque')) {
+// Função para salvar item 
+async function salvarItemEstoque(event) {
+    event.preventDefault();
+
+    if (!validarFormulario('formEstoque')) {
         mostrarNotificacao('Preencha todos os campos corretamente', 'erro');
         return;
     }
     
-    mostrarNotificacao('Item adicionado ao estoque com sucesso!', 'sucesso');
-     fecharModal();
+    const tipo = document.getElementById('tipoSementeEstoque').value;
+    const variedade = document.getElementById('variedadeEstoque').value;
+    const quantidade = parseFloat(document.getElementById('quantidadeEstoque').value);
+    const lote = document.getElementById('loteEstoque').value;
+    const validade = document.getElementById('validadeEstoque').value;
+    
+    const [ano, mes] = validade.split('-');
+    const validadeFormatada = `${mes}/${ano}`;
+    
+    const dados = {
+        tipo: tipo,
+        variedade: variedade,
+        quantidade: quantidade,
+        lote: lote,
+        validade: validadeFormatada
+    };
+    
+    try {
+        let resposta;
+        
+        if (itemEditando) {
+            // ATUALIZAR item existente
+            resposta = await fetch(`${API_URL}/${itemEditando.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dados)
+            });
+        } else {
+            // CRIAR novo item
+            resposta = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dados)
+            });
+        }
+        
+        if (!resposta.ok) {
+            const erro = await resposta.json();
+            throw new Error(erro.error || 'Erro ao salvar');
+        }
+        
+        const resultado = await resposta.json();
+        console.log(' Item salvo:', resultado);
+        
+        mostrarNotificacao(
+            itemEditando ? 'Item atualizado com sucesso!' : 'Item adicionado com sucesso!',
+            'sucesso'
+        );
+        
+        fecharModal();
+        
+      async function carregarEstoque() {
+         try {
+        const timestamp = new Date().getTime();
+        const resposta = await fetch(`${API_URL}?_=${timestamp}`);
+        
+        if (!resposta.ok) {
+            throw new Error('Erro ao carregar dados');
+        }
+        
+        estoqueData = await resposta.json();
+        console.log('Itens carregados (sem cache):', estoqueData);
+        
+        atualizarTabelaEstoque();
+        atualizarEstatisticas();
+        
+        return estoqueData;
+    } catch (erro) {
+        console.error('Erro ao carregar estoque:', erro);
+        mostrarNotificacao('Erro ao carregar estoque', 'erro');
+        return [];
+    }
+}
+        
+    } catch (erro) {
+        console.error('Erro ao salvar item:', erro);
+        mostrarNotificacao('Erro ao salvar item. Verifique o servidor.', 'erro');
+    }
 }
 
+// Função para carregar os itens do estoque e mostrar na tabela
+async function carregarEstoque() {
+    try {
+        const resposta = await fetch(API_URL);
+        if (!resposta.ok) {
+            throw new Error('Erro ao carregar dados');
+        }
+        
+        estoqueData = await resposta.json();
+        console.log('Itens carregados:', estoqueData);
+        
+        atualizarTabelaEstoque();
+        
+        atualizarEstatisticas();
+        
+        return estoqueData;
+    } catch (erro) {
+        console.error(' Erro ao carregar estoque:', erro);
+        mostrarNotificacao('Erro ao carregar estoque. Verifique o servidor.', 'erro');
+        return [];
+    }
+}
+
+function atualizarTabelaEstoque() {
+    const tbody = document.querySelector('.tabela-dados tbody');
+    if (!tbody) {
+        console.log(' Tabela não encontrada!');
+        return;
+    }
+    
+    tbody.innerHTML = ''; 
+    
+    if (estoqueData.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="7" style="text-align: center; padding: 2rem; color: #666;">
+                    <i class="fas fa-box-open" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+                    Nenhum item cadastrado. Clique em "Adicionar Item" para começar.
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    estoqueData.forEach(item => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${item.codigo}</td>
+            <td>${item.tipo_semente}</td>
+            <td>${item.variedade}</td>
+            <td>${item.quantidade}</td>
+            <td>${item.lote}</td>
+            <td>${item.validade}</td>
+            <td>
+                <button class="btn-icone" onclick="verDetalhesEstoque(${item.id})" title="Ver detalhes">
+                    <i class="fas fa-eye"></i>
+                </button>
+                <button class="btn-icone" onclick="editarItemEstoque(${item.id})" title="Editar">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn-icone btn-delete" onclick="excluirItemEstoque(${item.id})" title="Excluir">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+    
+    console.log(` Tabela atualizada com ${estoqueData.length} itens`);
+}
+
+// atualizar as estatísticas
+function atualizarEstatisticas() {
+    const totalEstoque = estoqueData.reduce((total, item) => total + parseFloat(item.quantidade), 0);
+    const estoqueBaixo = estoqueData.filter(item => parseFloat(item.quantidade) < 100).length;
+    const itensDisponiveis = estoqueData.length;
+    
+    const elementos = {
+        'total-estoque': `${totalEstoque.toFixed(0)} kg`,
+        'estoque-baixo': `${estoqueBaixo} itens`,
+        'itens-disponiveis': `${itensDisponiveis}`
+    };
+    
+    Object.keys(elementos).forEach(id => {
+        const elemento = document.getElementById(id);
+        if (elemento) {
+            elemento.textContent = elementos[id];
+        }
+    });
+    
+    const elementosEstatisticas = document.querySelectorAll('.valor-estatistica');
+    if (elementosEstatisticas.length >= 3) {
+        elementosEstatisticas[0].textContent = `${totalEstoque.toFixed(0)} kg`;
+        elementosEstatisticas[1].textContent = `${estoqueBaixo} itens`;
+        elementosEstatisticas[2].textContent = `${itensDisponiveis}`;
+    }
+}
+
+//  editar item
+async function editarItemEstoque(id) {
+    try {
+        const resposta = await fetch(`${API_URL}/${id}`);
+        if (!resposta.ok) {
+            throw new Error('Erro ao carregar item');
+        }
+        
+        const item = await resposta.json();
+        itemEditando = item;
+        lidarComAdicionarEstoque(item);
+        
+    } catch (erro) {
+        console.error('❌ Erro ao carregar item para edição:', erro);
+        mostrarNotificacao('Erro ao carregar item para edição', 'erro');
+    }
+}
+
+// ver detalhes
+async function verDetalhesEstoque(id) {
+    try {
+        const resposta = await fetch(`${API_URL}/${id}`);
+        if (!resposta.ok) {
+            throw new Error('Erro ao carregar detalhes');
+        }
+        
+        const item = await resposta.json();
+        
+        const conteudoModal = `
+            <h2>Detalhes do Item ${item.codigo}</h2>
+            <div style="margin-top: 1.5rem;">
+                <p><strong>ID:</strong> ${item.id}</p>
+                <p><strong>Código:</strong> ${item.codigo}</p>
+                <p><strong>Tipo:</strong> ${item.tipo_semente}</p>
+                <p><strong>Variedade:</strong> ${item.variedade}</p>
+                <p><strong>Quantidade:</strong> ${item.quantidade} kg</p>
+                <p><strong>Lote:</strong> ${item.lote}</p>
+                <p><strong>Validade:</strong> ${item.validade}</p>
+                <p><strong>Data de Cadastro:</strong> ${item.data_cadastro ? new Date(item.data_cadastro).toLocaleDateString('pt-BR') : 'N/A'}</p>
+                <p><strong>Status:</strong> 
+                    <span class="status-ativo" style="padding: 3px 8px; border-radius: 12px; font-size: 0.85rem; background-color: #d4edda; color: #155724;">
+                        Ativo
+                    </span>
+                </p>
+            </div>
+        `;
+        
+        document.getElementById('corpoModal').innerHTML = conteudoModal;
+        document.getElementById('modal').style.display = 'block';
+        
+    } catch (erro) {
+        console.error(' Erro ao carregar detalhes:', erro);
+        mostrarNotificacao('Erro ao carregar detalhes do item', 'erro');
+    }
+}
+
+// excluir item
+async function excluirItemEstoque(id) {
+    if (!confirm('Tem certeza que deseja excluir este item do estoque?')) {
+        return;
+    }
+    
+    try {
+        const resposta = await fetch(`${API_URL}/${id}`, {
+            method: 'DELETE'
+        });
+        
+        if (!resposta.ok) {
+            const erro = await resposta.json();
+            throw new Error(erro.error || 'Erro ao excluir');
+        }
+        
+        mostrarNotificacao(' Item excluído com sucesso!', 'sucesso');
+        
+        await carregarEstoque();
+        
+    } catch (erro) {
+        console.error('Erro ao excluir item:', erro);
+        mostrarNotificacao('Erro ao excluir item', 'erro');
+    }
+}
+
+// funções originais que redireciona para a nova função (mantidas apenas para compatibilidade)
 function verEstoque(id) {
-    mostrarNotificacao(`Visualizando item de estoque #${id}`, 'info');
-    const conteudoModal = `
-        <h2>Detalhes do Item SEM-${String(id).padStart(3, '0')}</h2>
-        <div style="margin-top: 1.5rem;">
-            <p><strong>Tipo:</strong> Milho</p>
-            <p><strong>Variedade:</strong> BRS 1030</p>
-            <p><strong>Quantidade:</strong> 850 kg</p>
-            <p><strong>Lote:</strong> L2025-001</p>
-            <p><strong>Validade:</strong> 12/2026</p>
-            <p><strong>Localização:</strong> Armazém A - Prateleira 3</p>
-        </div>
-    `;
-    document.getElementById('corpoModal').innerHTML = conteudoModal;
-    document.getElementById('modal').style.display = 'block';
+    verDetalhesEstoque(id);
 }
 
 function editarEstoque(id) {
-    mostrarNotificacao(`Editando item de estoque #${id}`, 'info');
-    lidarComAdicionarEstoque();
+    editarItemEstoque(id);
+}
+
+function salvarNovoEstoque(evento) {
+    salvarItemEstoque(evento);
 }
 
 //relatórios
@@ -907,6 +1189,7 @@ function mostrarModal(titulo, mensagem) {
 
 function fecharModal() {
     document.getElementById('modal').style.display = 'none';
+    itemEditando = null;
 }
 
 //notificações
@@ -943,10 +1226,10 @@ function mostrarNotificacao(mensagem, tipo = 'info') {
     }, 3000);
 }
 
-//  cONFIGURAÇÃO INICIAL
+// CONFIGURAÇÃO INICIAL 
 document.addEventListener('DOMContentLoaded', function() {
-
     console.log('Sistema de Gestão de Sementes - IPA iniciado');
+    
     
     document.addEventListener('click', function(evento) {
         const modal = document.getElementById('modal');
@@ -960,7 +1243,6 @@ document.addEventListener('DOMContentLoaded', function() {
         btnFecharModal.addEventListener('click', fecharModal);
     }
     
-    //  estilos 
     if (!document.querySelector('#estilos-sistema')) {
         const estilo = document.createElement('style');
         estilo.id = 'estilos-sistema';
@@ -1015,19 +1297,33 @@ document.addEventListener('DOMContentLoaded', function() {
                 font-weight: 500;
             }
             
-            /* Asterisco vermelho para campos obrigatórios */
-            .grupo-formulario label[for*="obrigatorio"]::after,
-            .grupo-formulario input:required + label::after,
-            .grupo-formulario select:required + label::after,
-            .grupo-formulario textarea:required + label::after {
-                content: ' *';
-                color: #dc3545;
+            /* Botões do modal */
+            .botoes-modal {
+                display: flex;
+                justify-content: flex-end;
+                gap: 10px;
+                margin-top: 20px;
+                padding-top: 20px;
+                border-top: 1px solid #eee;
+            }
+            
+            /* Botão de excluir */
+            .btn-icone.btn-delete {
+                background-color: #dc3545 !important;
+                color: white !important;
+                border-radius: 4px;
+                padding: 5px 8px !important;
+                margin-left: 5px;
+            }
+            
+            .btn-icone.btn-delete:hover {
+                background-color: #c82333 !important;
+                color: white !important;
             }
         `;
         document.head.appendChild(estilo);
     }
     
-    // Configurar validação em tempo real para outros campos
     const camposValidacao = {
         'nomeCompleto': 'nomeCompleto',
         'email': 'email',
@@ -1049,7 +1345,6 @@ document.addEventListener('DOMContentLoaded', function() {
         'cidade': 'obrigatorio'
     };
     
-
     Object.keys(camposValidacao).forEach(id => {
         const campo = document.getElementById(id);
         if (campo) {
@@ -1057,7 +1352,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 validarCampo(this, camposValidacao[id]);
             });
             
-        
             campo.addEventListener('input', function() {
                 if (this.classList.contains('invalido')) {
                     this.classList.remove('invalido');
@@ -1070,19 +1364,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    function determinarTipoPorId(id) {
-        if (id === 'cpf') return 'cpf';
-        if (id === 'cnpjFornecedor') return 'cnpj';
-        if (id === 'email') return 'email';
-        if (id === 'telefone') return 'telefone';
-        if (id === 'cep') return 'cep';
-        if (id === 'nomeCompleto') return 'nomeCompleto';
-        if (id === 'novaSenha' || id === 'senhaAtual') return 'senha';
-        if (id === 'quantidadePedido' || id === 'quantidadeEstoque') return 'numeroPositivo';
-        if (id === 'validadeEstoque') return 'dataFutura';
-        return 'obrigatorio';
-    }
-    
     const btnSair = document.querySelector('.btn-sair');
     if (btnSair) {
         btnSair.addEventListener('click', function(e) {
@@ -1116,6 +1397,15 @@ document.addEventListener('DOMContentLoaded', function() {
         formPerfil.addEventListener('submit', function(e) {
             lidarComSalvarAlteracoes(e);
         });
+    }
+    
+    const caminho = window.location.pathname;
+    if (caminho.includes('estoque') || caminho.endsWith('/estoque.html')) {
+        console.log(' Inicializando módulo de estoque...');
+        
+        setTimeout(() => {
+            carregarEstoque();
+        }, 500);
     }
     
     // adicionar asterisco vermelho para campos obrigatórios
